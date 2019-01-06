@@ -29,7 +29,7 @@ Roomba roomba(&Serial, Roomba::Baud115200);
 
 // Variables
 bool toggle = true;
-const int noSleepPin = 2;
+const int noSleepPin = 0;
 bool boot = true;
 long battery_Current_mAh = 0;
 long battery_Voltage = 0;
@@ -43,6 +43,7 @@ uint8_t tempBuf[10];
 
 void setup_wifi() 
 {
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) 
   {
@@ -72,7 +73,7 @@ void reconnect()
           boot = false;
         }
         // ... and resubscribe
-        client.subscribe("roomba/commands");
+        client.subscribe("roomba/command");
       } 
       else 
       {
@@ -93,13 +94,13 @@ void callback(char* topic, byte* payload, unsigned int length)
   String newTopic = topic;
   payload[length] = '\0';
   String newPayload = String((char *)payload);
-  if (newTopic == "roomba/commands") 
+  if (newTopic == "roomba/command") 
   {
-    if (newPayload == "start")
+    if (newPayload == "turn_on")
     {
       startCleaning();
     }
-    if (newPayload == "stop")
+    if (newPayload == "return_to_base")
     {
       stopCleaning();
     }
@@ -166,7 +167,6 @@ void stayAwakeHigh()
 }
 
 
-
 void setup() 
 {
   pinMode(noSleepPin, OUTPUT);
@@ -181,10 +181,15 @@ void setup()
   client.setCallback(callback);
   timer.setInterval(5000, sendInfoRoomba);
   timer.setInterval(60000, stayAwakeLow);
+  ArduinoOTA.setPort(OTAport);
+  ArduinoOTA.setHostname(mqtt_client_name);
+  ArduinoOTA.begin(); 
+  //Serial.println("Ready");
 }
 
 void loop() 
 {
+  ArduinoOTA.handle();
   if (!client.connected()) 
   {
     reconnect();
