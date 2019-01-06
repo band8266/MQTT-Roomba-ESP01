@@ -1,5 +1,8 @@
-# ESP-01_Roomba
+# ESP8266_Roomba
+Forked fom Rob @thehookup .  https://www.youtube.com/watch?v=t2NgA8qYcFI
 
-An arduino program to add MQTT commands to your roomba 500 or 600 series.
+also changed the wake pin
+also added wifi_sta for d1 mini
+Changed to work the the MQTT Vacuum component in Home Assistant 
 
-https://www.youtube.com/watch?v=t2NgA8qYcFI
+
